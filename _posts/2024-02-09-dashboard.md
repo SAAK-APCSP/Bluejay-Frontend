@@ -72,7 +72,8 @@
             if (postText.trim() !== "") {
                 try {
                     // Assuming you have a POST endpoint for creating posts
-                    const response = await fetch('https://your-api-url/posts', {
+                    const response = await fetch('{site.baseurl}/api/message/
+', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -98,7 +99,8 @@
         async function fetchPosts() {
             try {
                 // Assuming you have a GET endpoint for fetching posts
-                const response = await fetch('https://your-api-url/posts');
+                const response = await fetch('{site.baseurl}/api/message/
+');
 
                 if (response.ok) {
                     const postsData = await response.json();
