@@ -1,46 +1,68 @@
----
-comments: True
-layout: post
-toc: false
-title: Dashboard
-permalink: /dashboard
-type: hacks
-courses: { "compsci": { "week": 2 } }
----
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Chat</title>
     <style>
-        #posts {
-            max-width: 400px;
+        .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 800px;
             margin: auto;
         }
 
-        .post {
+        .posts-container, .input-container {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .post-container {
             border: 1px solid #ccc;
             margin-bottom: 10px;
             padding: 10px;
         }
 
-        #postInput {
+        .input-container textarea {
             width: 100%;
-            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
-        #postButton {
-            margin-top: 10px;
+        .input-container button {
+            display: block;
+            width: 100%;
+        }
+
+        #latestPosts {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .latestPost {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="posts"></div>
-    <textarea id="postInput" placeholder="Type your post..."></textarea>
-    <button id="postButton" onclick="createPost()">Post</button>
+    <div class="container">
+        <div class="input-container">
+            <h2>Post Your Message</h2>
+            <textarea id="postInput" placeholder="Type your post..."></textarea>
+            <button id="postButton" onclick="createPost()">Post</button>
+        </div>
+        <div class="posts-container">
+            <h2>Posts</h2>
+            <div id="posts"></div>
+        </div>
+    </div>
 
     <script>
+        // Define an object to store the latest post from each user
+        let latestPosts = {};
+
         async function createPost() {
             var postInput = document.getElementById("postInput");
             var postsContainer = document.getElementById("posts");
@@ -86,16 +108,35 @@ courses: { "compsci": { "week": 2 } }
                     postsContainer.innerHTML = "";  // Clear previous posts
                     postsData.forEach(post => {
                         var postElement = document.createElement("div");
-                        postElement.className = "post";
+                        postElement.className = "post-container";
                         postElement.innerHTML = "<p>User: " + post.text + "</p>";
                         postsContainer.appendChild(postElement);
+
+                        // Update latest post for each user
+                        latestPosts[post.userId] = post.text;
                     });
+
+                    // Update latest posts box
+                    updateLatestPostsBox();
                 } else {
                     console.error('Failed to fetch posts');
                 }
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        function updateLatestPostsBox() {
+            var latestPostsContainer = document.getElementById("latestPosts");
+            latestPostsContainer.innerHTML = "";  // Clear previous latest posts
+
+            // Display latest post from each user
+            Object.keys(latestPosts).forEach(userId => {
+                var latestPostElement = document.createElement("div");
+                latestPostElement.className = "latestPost";
+                latestPostElement.innerHTML = "<p>User " + userId + ": " + latestPosts[userId] + "</p>";
+                latestPostsContainer.appendChild(latestPostElement);
+            });
         }
 
         // Fetch and display posts when the page loads
