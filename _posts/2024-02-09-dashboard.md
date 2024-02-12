@@ -7,101 +7,99 @@ permalink: /dashboard
 type: hacks
 courses: { "compsci": { "week": 2 } }
 ---
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
+    <title>Social Media Chat</title>
     <style>
-        @keyframes strobe {
-            0%, 20%, 50%, 80%, 100% {
-                border-color: #FF0000; /* Red */
-            }
-            40% {
-                border-color: #FF7F00; /* Orange */
-            }
-            60% {
-                border-color: #FFFF00; /* Yellow */
-            }
-            80% {
-                border-color: #00FF00; /* Green */
-            }
+        #posts {
+            max-width: 400px;
+            margin: auto;
         }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #171515;
-            color: #39FF14;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        .post {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
         }
 
-        .login-container {
-            border-radius: 15px;
-            padding: 20px;
-            border: 5px solid transparent;
-            background-clip: padding-box;
-            background-color: #171515;
-            color: #39FF14;
-            animation: strobe 2s infinite; /* Apply strobe light effect to the border */
-            width: 300px; /* Adjusted width */
-        }
-
-        input[type=text], input[type=password] {
+        #postInput {
             width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #39FF14;
-            box-sizing: border-box;
-            background-color: #171515;
-            color: #39FF14;
+            margin-top: 10px;
         }
 
-        button {
-            background-color: #39FF14;
-            color: #171515;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%; /* Adjusted width */
-        }
-
-        button:hover {
-            opacity: 0.8;
-        }
-
-        span.psw {
-            display: block;
-            text-align: center;
-            margin-top: 16px;
-            color: #39FF14;
-        }
-
-        @media screen and (max-width: 300px) {
-            span.psw {
-                display: block;
-                float: none;
-            }
+        #postButton {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <label for="uname"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="uname" required>
+    <div id="posts"></div>
+    <textarea id="postInput" placeholder="Type your post..."></textarea>
+    <button id="postButton" onclick="createPost()">Post</button>
 
-        <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" required>
+    <script>
+        async function createPost() {
+            var postInput = document.getElementById("postInput");
+            var postsContainer = document.getElementById("posts");
 
-        <button type="submit">Login</button>
+            var postText = postInput.value;
 
-        <span class="psw">Forgot <a href="#">password?</a></span>
-    </div>
+            if (postText.trim() !== "") {
+                try {
+                    // Assuming you have a POST endpoint for creating posts
+                    const response = await fetch('https://your-api-url/posts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include any necessary headers (e.g., authorization token)
+                        },
+                        body: JSON.stringify({ text: postText })
+                    });
+
+                    if (response.ok) {
+                        // Post successfully created, now fetch and display all posts
+                        fetchPosts();
+                        // Clear the input field after creating the post
+                        postInput.value = "";
+                    } else {
+                        console.error('Failed to create post');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        }
+
+        async function fetchPosts() {
+            try {
+                // Assuming you have a GET endpoint for fetching posts
+                const response = await fetch('https://your-api-url/posts');
+
+                if (response.ok) {
+                    const postsData = await response.json();
+
+                    // Display posts in the front-end
+                    var postsContainer = document.getElementById("posts");
+                    postsContainer.innerHTML = "";  // Clear previous posts
+                    postsData.forEach(post => {
+                        var postElement = document.createElement("div");
+                        postElement.className = "post";
+                        postElement.innerHTML = "<p>User: " + post.text + "</p>";
+                        postsContainer.appendChild(postElement);
+                    });
+                } else {
+                    console.error('Failed to fetch posts');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Fetch and display posts when the page loads
+        fetchPosts();
+    </script>
 </body>
 </html>
