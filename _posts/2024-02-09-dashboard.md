@@ -79,7 +79,7 @@ courses: { "compsci": { "week": 2 } }
 
                     // Display posts in the front-end
                     var postsContainer = document.getElementById("posts");
-                    postsContainer.innerHTML = "";
+                    postsContainer.innerHTML = "";  // Clear previous posts
                     postsData.forEach(post => {
                         var postElement = document.createElement("div");
                         postElement.innerHTML = "<p>User: " + post.text + "</p>";
