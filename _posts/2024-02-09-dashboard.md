@@ -4,36 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Chat</title>
-    <style>
+    <style lang="scss">
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        $primary-color: #007bff;
+        $secondary-color: #6c757d;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
         .container {
             display: flex;
             justify-content: space-between;
             max-width: 800px;
             margin: auto;
+            padding: 20px;
         }
 
-        .posts-container, .input-container {
+        .input-container,
+        .posts-container {
             flex: 1;
             padding: 10px;
         }
 
         .post-container {
+            position: relative;
             border: 1px solid #ccc;
             margin-bottom: 10px;
             padding: 10px;
+            background-color: #fff;
+        }
+
+        .post-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .post-actions button {
+            margin-right: 5px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
         }
 
         .input-container textarea {
             width: 100%;
             margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            resize: vertical;
         }
 
         .input-container button {
             display: block;
             width: 100%;
+            padding: 10px;
+            background-color: $primary-color;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        #latestPosts {
+        .input-container button:hover {
+            background-color: darken($primary-color, 10%);
+        }
+
+        .latest-posts {
             margin-top: 20px;
             border-top: 1px solid #ccc;
             padding-top: 20px;
@@ -59,6 +106,8 @@
         </div>
     </div>
 
+    <div id="latestPosts" class="latest-posts"></div>
+
     <script>
         // Define an object to store the latest post from each user
         let latestPosts = {};
@@ -72,14 +121,13 @@
             if (postText.trim() !== "") {
                 try {
                     // Assuming you have a POST endpoint for creating posts
-                    const response = await fetch('{site.baseurl}/api/message/
-', {
+                    const response = await fetch('{site.baseurl}/api/message/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             // Include any necessary headers (e.g., authorization token)
                         },
-                        body: JSON.stringify({ text: postText })
+                        body: JSON.stringify({ text: postText, likes: 0, dislikes: 0 }) // Initialize likes and dislikes
                     });
 
                     if (response.ok) {
@@ -99,8 +147,7 @@
         async function fetchPosts() {
             try {
                 // Assuming you have a GET endpoint for fetching posts
-                const response = await fetch('{site.baseurl}/api/message/
-');
+                const response = await fetch('{site.baseurl}/api/message/');
 
                 if (response.ok) {
                     const postsData = await response.json();
@@ -111,7 +158,13 @@
                     postsData.forEach(post => {
                         var postElement = document.createElement("div");
                         postElement.className = "post-container";
-                        postElement.innerHTML = "<p>User: " + post.text + "</p>";
+                        postElement.innerHTML = "<p>User: " + post.text + "</p>" +
+                            "<div class='post-actions'>" +
+                            "<button onclick='likePost(" + post.id + ")'>Like</button>" +
+                            "<span id='likeCount" + post.id + "'>" + post.likes + "</span>" +
+                            "<button onclick='dislikePost(" + post.id + ")'>Dislike</button>" +
+                            "<span id='dislikeCount" + post.id + "'>" + post.dislikes + "</span>" +
+                            "</div>";
                         postsContainer.appendChild(postElement);
 
                         // Update latest post for each user
@@ -122,6 +175,52 @@
                     updateLatestPostsBox();
                 } else {
                     console.error('Failed to fetch posts');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function likePost(postId) {
+            try {
+                // Assuming you have a PUT endpoint for updating posts
+                const response = await fetch('{site.baseurl}/api/message/' + postId + '/like', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Include any necessary headers (e.g., authorization token)
+                    },
+                    body: JSON.stringify({ action: 'like' })
+                });
+
+                if (response.ok) {
+                    // Post liked successfully, fetch and display posts again
+                    fetchPosts();
+                } else {
+                    console.error('Failed to like post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function dislikePost(postId) {
+            try {
+                // Assuming you have a PUT endpoint for updating posts
+                const response = await fetch('{site.baseurl}/api/message/' + postId + '/dislike', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Include any necessary headers (e.g., authorization token)
+                    },
+                    body: JSON.stringify({ action: 'dislike' })
+                });
+
+                if (response.ok) {
+                    // Post disliked successfully, fetch and display posts again
+                    fetchPosts();
+                } else {
+                    console.error('Failed to dislike post');
                 }
             } catch (error) {
                 console.error('Error:', error);
