@@ -146,10 +146,12 @@
 <body>
     <div class="container">
         <div class="input-container">
+        <form action="javascript:createPost()" id="postButton">
             <h2>Post Your Message</h2>
-            <input type="text" id="uid" placeholder="Enter UID..." disabled>
-            <textarea id="message" placeholder="Type your post..." disabled></textarea>
-            <button id="postButton" disabled>Post</button>
+            <input type="text" id="uid" placeholder="Enter UID..." enabled>
+            <textarea id="message" placeholder="Type your post..." enabled></textarea>
+            <button id="postButton" onclick="createPost()" enabled>Post</button>
+        </form>
         </div>
         <div class="posts-container">
             <h2>Posts</h2>
@@ -157,61 +159,15 @@
         </div>
     </div>
     <div id="latestPosts" class="latest-posts"></div>
-
     <script type="module">
         import { uri, options } from '{{site.baseurl}}/config.js';
-
-        document.addEventListener("DOMContentLoaded", function() {
-            checkAuthentication();
-
-            function checkAuthentication() {
-                var myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-
-                const url = uri + '/api/users/checkAuthentication';
-
-                const authOptions = {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    headers: myHeaders,
-                    credentials: 'include'
-                };
-
-                fetch(url, authOptions)
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error('Authentication check failed:', response.status);
-                            window.location.href = "{{site.baseurl}}/login";
-                        } else {
-                            enablePostFunctionality();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        window.location.href = "{{site.baseurl}}/login";
-                    });
-            }
-
-            function enablePostFunctionality() {
-                document.getElementById("uid").removeAttribute("disabled");
-                document.getElementById("message").removeAttribute("disabled");
-                document.getElementById("postButton").removeAttribute("disabled");
-
-                document.getElementById("postButton").addEventListener("click", createPost);
-
-                fetchPosts();
-            }
-
             function createPost() {
                 var myHeaders = new Headers();
                 myHeaders.append("Content-Type", "application/json");
-
-                const uri = '{{site.baseurl}}';
                 const body = {
                     uid: document.getElementById("uid").value,
                     message: document.getElementById("message").value
                 };
-
                 const authOptions = {
                     method: 'POST',
                     cache: 'no-cache',
@@ -219,7 +175,6 @@
                     body: JSON.stringify(body),
                     credentials: 'include'
                 };
-
                 fetch(uri + '/api/messages/send', authOptions)
                     .then(response => {
                         if (!response.ok) {
@@ -243,11 +198,9 @@
                         console.error('Error:', error);
                     });
             }
-
             function fetchPosts() {
                 // Implement the code to fetch and display posts
-            }
-        });
+            };
     </script>
 </body>
 </html>
