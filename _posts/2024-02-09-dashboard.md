@@ -144,6 +144,14 @@
     </style> -->
 </head>
 <body>
+    <div class="login-container">
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" required>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+        <button type="submit">Login</button>
+        <span class="psw">Forgot <a href="#">password?</a></span>
+    </div>
     <div class="container">
         <div class="input-container">
             <h2>Post Your Message</h2>
