@@ -144,20 +144,12 @@
     </style> -->
 </head>
 <body>
-    <div class="login-container">
-        <label for="uname"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="uname" required>
-        <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" required>
-        <button type="submit">Login</button>
-        <span class="psw">Forgot <a href="#">password?</a></span>
-    </div>
     <div class="container">
         <div class="input-container">
             <h2>Post Your Message</h2>
-            <input type="text" id="uid" placeholder="Enter UID...">
-            <textarea id="message" placeholder="Type your post..."></textarea>
-            <button id="postButton">Post</button>
+            <input type="text" id="uid" placeholder="Enter UID..." disabled>
+            <textarea id="message" placeholder="Type your post..." disabled></textarea>
+            <button id="postButton" disabled>Post</button>
         </div>
         <div class="posts-container">
             <h2>Posts</h2>
@@ -165,19 +157,61 @@
         </div>
     </div>
     <div id="latestPosts" class="latest-posts"></div>
+
     <script type="module">
         import { uri, options } from '{{site.baseurl}}/config.js';
+
         document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("postButton").addEventListener("click", createPost);
-            // console.log(location.hostname);
+            checkAuthentication();
+
+            function checkAuthentication() {
+                var myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+
+                const url = uri + '/api/users/checkAuthentication';
+
+                const authOptions = {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: myHeaders,
+                    credentials: 'include'
+                };
+
+                fetch(url, authOptions)
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error('Authentication check failed:', response.status);
+                            window.location.href = "{{site.baseurl}}/login";
+                        } else {
+                            enablePostFunctionality();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        window.location.href = "{{site.baseurl}}/login";
+                    });
+            }
+
+            function enablePostFunctionality() {
+                document.getElementById("uid").removeAttribute("disabled");
+                document.getElementById("message").removeAttribute("disabled");
+                document.getElementById("postButton").removeAttribute("disabled");
+
+                document.getElementById("postButton").addEventListener("click", createPost);
+
+                fetchPosts();
+            }
+
             function createPost() {
                 var myHeaders = new Headers();
                 myHeaders.append("Content-Type", "application/json");
+
                 const uri = '{{site.baseurl}}';
                 const body = {
                     uid: document.getElementById("uid").value,
                     message: document.getElementById("message").value
                 };
+
                 const authOptions = {
                     method: 'POST',
                     cache: 'no-cache',
@@ -185,18 +219,11 @@
                     body: JSON.stringify(body),
                     credentials: 'include'
                 };
-                let error_Msg = ''; // Declare error_Msg outside of any block
+
                 fetch(uri + '/api/messages/send', authOptions)
                     .then(response => {
-                        if (response.status == 400) {
-                            error_Msg = 'This account does not exist.'; // Assign value to error_Msg
-                            alert(error_Msg); // Display error message
-                            return null;
-                        }
                         if (!response.ok) {
-                            error_Msg = 'Login error: ' + response.status;
-                            alert(error_Msg); // Display error message
-                            console.log(error_Msg);
+                            console.error('Failed to create post:', response.status);
                             return null;
                         }
                         const contentType = response.headers.get('Content-Type');
@@ -209,11 +236,16 @@
                     .then(data => {
                         if (data !== null) {
                             console.log('Response:', data);
-                            // console.log(document.cookie);
-                            // window.location.href = "{{site.baseurl}}/2024/02/12/table.html";
+                            fetchPosts();
                         }
-                        // window.location.href = "{{site.baseurl}}/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                     });
+            }
+
+            function fetchPosts() {
+                // Implement the code to fetch and display posts
             }
         });
     </script>
