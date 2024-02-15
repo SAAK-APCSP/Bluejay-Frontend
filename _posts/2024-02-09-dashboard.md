@@ -148,9 +148,9 @@
         <div class="input-container">
         <form action="javascript:createPost()" id="postButton">
             <h2>Post Your Message</h2>
-            <input type="text" id="uid" placeholder="Enter UID..." enabled>
-            <textarea id="message" placeholder="Type your post..." enabled></textarea>
-            <button id="postButton" onclick="createPost()" enabled>Post</button>
+            <input type="text" id="uid" placeholder="Enter UID...">
+            <textarea id="message" placeholder="Type your post..."></textarea>
+            <button id="postButton">Post</button>
         </form>
         </div>
         <div class="posts-container">
@@ -197,29 +197,7 @@
                     console.error('Error:', error);
                 });
         }
-
         function fetchPosts() {
             // Implement the code to fetch and display posts
         }
     </script>
-</head>
-
-<body>
-    <div class="container">
-        <div class="input-container">
-            <form action="javascript:createPost()" id="postButton">
-                <h2>Post Your Message</h2>
-                <input type="text" id="uid" placeholder="Enter UID..." enabled>
-                <textarea id="message" placeholder="Type your post..." enabled></textarea>
-                <button id="postButton" onclick="createPost()" enabled>Post</button>
-            </form>
-        </div>
-        <div class="posts-container">
-            <h2>Posts</h2>
-            <div id="posts"></div>
-        </div>
-    </div>
-    <div id="latestPosts" class="latest-posts"></div>
-</body>
-
-</html>
