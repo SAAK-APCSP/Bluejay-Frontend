@@ -214,17 +214,14 @@
                 console.error('Error:', error);
             });
     }
-
     function fetchPosts() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-
         const authOptions = {
             method: 'GET',
             headers: myHeaders,
             credentials: 'include'
         };
-
         fetch('http://127.0.0.1:8086/api/messages/', authOptions)
             .then(response => {
                 if (!response.ok) {
@@ -245,7 +242,6 @@
                 console.error('Error:', error);
             });
     }
-
     function displayPosts(posts) {
         const postsContainer = document.getElementById('posts');
         postsContainer.innerHTML = ''; // Clear existing posts
@@ -253,7 +249,6 @@
             updatePostsContainer(post.uid, post.message, post.likes);
         });
     }
-
     function updatePostsContainer(uid, message, likes) {
         const postsContainer = document.getElementById('posts');
         const postDiv = document.createElement('div');
@@ -276,7 +271,6 @@
         postDiv.appendChild(likesCountSpan); // Include likes count
         postsContainer.appendChild(postDiv);
     }
-
     function showReplyForm(parentUID) {
         const replyFormContainer = document.getElementById('replyFormContainer');
         replyFormContainer.innerHTML = ''; // Clear existing content
@@ -289,7 +283,6 @@
         `;
         replyFormContainer.appendChild(replyForm);
     }
-
     function postReply(parentUID) {
         const replyMessage = document.getElementById('replyMessage').value;
         var myHeaders = new Headers();
@@ -333,11 +326,9 @@
                 console.error('Error:', error);
             });
     }
-
     function likePost(uid) {
         // Implement liking a post here (similar to createPost and postReply)
     }
-
     function searchPosts() {
         const searchInput = document.getElementById('searchInput').value.toLowerCase();
         const postsContainer = document.getElementById('posts');
