@@ -24,8 +24,7 @@
             background-color: #171515;
             color: #39FF14;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             height: 100vh;
         }
         .login-container {
@@ -37,51 +36,19 @@
             color: #39FF14;
             animation: strobe 2s infinite; /* Apply strobe light effect to the border */
             width: 300px; /* Adjusted width */
-        }
-        input[type=text], input[type=password] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #39FF14;
-            box-sizing: border-box;
-            background-color: #171515;
-            color: #39FF14;
-        }
-        button {
-            background-color: #39FF14;
-            color: #171515;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%; /* Adjusted width */
-        }
-        button:hover {
-            opacity: 0.8;
-        }
-        span.psw {
-            display: block;
-            text-align: center;
-            margin-top: 16px;
-            color: #39FF14;
-        }
-        @media screen and (max-width: 300px) {
-            span.psw {
-                display: block;
-                float: none;
-            }
+            margin: auto; /* Center the login container */
+            margin-bottom: 20px; /* Add margin at the bottom */
         }
         .container {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column-reverse; /* Reverse the order of the posts */
             max-width: 800px;
             margin: auto;
             padding: 20px;
+            flex: 1; /* Take remaining space */
         }
         .input-container,
         .posts-container {
-            flex: 1;
             padding: 10px;
         }
         .post-container {
@@ -133,19 +100,15 @@
             margin-bottom: 5px;
         }
         .post-container {
-        position: relative;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-        padding: 10px;
-        background-color: #000; /* Black background color */
-        color: #fff; /* Text color */
-    }
-    .post-content {
-        margin: 0; /* Remove default margin for <p> */
-    }
-    #postsWrapper {
-            max-height: 300px; /* Adjust the maximum height as needed */
-            overflow-y: auto; /* Enable vertical scrolling */
+            position: relative;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #000; /* Black background color */
+            color: #fff; /* Text color */
+        }
+        .post-content {
+            margin: 0; /* Remove default margin for <p> */
         }
     </style>
 </head>
@@ -228,6 +191,7 @@
             .then(posts => {
                 if (posts === null || posts === undefined) {
                     console.warn('Received null or undefined posts.');
+                    alert('Please Log in first!')
                     return;
                 }
                 console.log('Fetched Posts:', posts);
@@ -245,27 +209,31 @@
         });
     }
     function updatePostsContainer(uid, message, likes) {
-        const postsContainer = document.getElementById('posts');
-        const postDiv = document.createElement('div');
-        postDiv.className = 'post-container';
-        const postContent = document.createElement('p');
-        postContent.className = 'post-content';
-        postContent.textContent = `UID: ${uid}, Message: ${message}`;
-        const replyButton = document.createElement('button');
-        replyButton.textContent = 'Reply';
-        replyButton.addEventListener('click', () => showReplyForm(uid));
-        const likeButton = document.createElement('button'); // Like button
-        likeButton.textContent = 'Like';
-        likeButton.addEventListener('click', () => likePost(uid));
-        const likesCountSpan = document.createElement('span');
-        likesCountSpan.className = 'likes-count';
-        likesCountSpan.textContent = `${likes} 👍`; // Display likes count
-        postDiv.appendChild(postContent);
-        postDiv.appendChild(replyButton);
-        postDiv.appendChild(likeButton);
-        postDiv.appendChild(likesCountSpan); // Include likes count
-        postsContainer.appendChild(postDiv);
-    }
+    const postsContainer = document.getElementById('posts');
+    const postDiv = document.createElement('div');
+    postDiv.className = 'post-container';
+    const postContent = document.createElement('p');
+    postContent.className = 'post-content';
+    postContent.textContent = `UID: ${uid}, Message: ${message}`;
+    const replyButton = document.createElement('button');
+    replyButton.textContent = 'Reply';
+    replyButton.addEventListener('click', () => showReplyForm(uid));
+    const likeButton = document.createElement('button'); // Like button
+    likeButton.textContent = 'Like';
+    likeButton.addEventListener('click', () => {
+        likePost(uid, message);
+        // Hide the like button after clicking
+        likeButton.style.display = 'none';
+    });
+    const likesCountSpan = document.createElement('span');
+    likesCountSpan.className = 'likes-count';
+    likesCountSpan.textContent = `${likes} 👍`; // Display likes count
+    postDiv.appendChild(postContent);
+    postDiv.appendChild(replyButton);
+    postDiv.appendChild(likeButton);
+    postDiv.appendChild(likesCountSpan); // Include likes count
+    postsContainer.appendChild(postDiv);
+}
     function showReplyForm(parentUID) {
         const replyFormContainer = document.getElementById('replyFormContainer');
         replyFormContainer.innerHTML = ''; // Clear existing content
@@ -320,11 +288,11 @@
                 console.error('Error:', error);
             });
     }
-    function likePost(uid) {
+    function likePost(uid, message) {
         // Increment the like count in the DOM immediately
         const likesCountSpan = document.querySelector(`.post-container[data-uid="${uid}"] .likes-count`);
         if (likesCountSpan) {
-            const currentLikes = parseInt(likesCountSpan.textContent, 10) || 0;
+            var currentLikes = parseInt(likesCountSpan.textContent, 10) || 0;
             likesCountSpan.textContent = `${currentLikes + 1} 👍`;
         }
         // Now, send the request to the server to update likes
@@ -332,7 +300,7 @@
         myHeaders.append("Content-Type", "application/json");
         // Prepare the request body
         const body = {
-            uid: uid,
+            message: message,
         };
         const authOptions = {
             method: 'PUT', // Assuming you are using a PUT request to update likes
@@ -341,7 +309,7 @@
             body: JSON.stringify(body),
             credentials: 'include'
         };
-        fetch(`http://127.0.0.1:8086/api/messages/like/${uid}`, authOptions)
+        fetch(`http://127.0.0.1:8086/api/messages/like`, authOptions)
             .then(response => {
                 if (!response.ok) {
                     console.error('Failed to like post:', response.status);
