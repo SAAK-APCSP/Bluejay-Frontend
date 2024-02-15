@@ -167,51 +167,12 @@
         </div>
         <div class="posts-container">
             <h2>Posts</h2>
+            <input type="text" id="searchInput" oninput="searchPosts()" placeholder="Search posts...">
             <div id="posts"></div>
         </div>
     </div>
     <div id="latestPosts" class="latest-posts"></div>
     <script>
-        // function createPost() {
-        //     var myHeaders = new Headers();
-        //     myHeaders.append("Content-Type", "application/json");
-        //     const body = {
-        //         uid: document.getElementById("uid").value,
-        //         message: document.getElementById("message").value
-        //     };
-        //     const authOptions = {
-        //         method: 'POST',
-        //         cache: 'no-cache',
-        //         headers: myHeaders,
-        //         body: JSON.stringify(body),
-        //         credentials: 'include'
-        //     };
-        //     fetch('http://127.0.0.1:8086/api/messages/send', authOptions)
-        //         .then(response => {
-        //             if (!response.ok) {
-        //                 console.error('Failed to create post:', response.status);
-        //                 return null;
-        //             }
-        //             const contentType = response.headers.get('Content-Type');
-        //             if (contentType && contentType.includes('application/json')) {
-        //                 return response.json();
-        //             } else {
-        //                 return response.text();
-        //             }
-        //         })
-        //         .then(data => {
-        //             if (data !== null) {
-        //                 console.log('Response:', data);
-        //                 fetchPosts();
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //         });
-        // }
-        // function fetchPosts() {
-        //     // Implement the code to fetch and display posts
-        // }
         function createPost() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -293,7 +254,7 @@
             likeButton.addEventListener('click', () => likePost(uid));
             const likesCountSpan = document.createElement('span');
             likesCountSpan.className = 'likes-count';
-            likesCountSpan.textContent = `${likes} Likes`; // Display likes count
+            likesCountSpan.textContent = `${likes} 👍`; // Display likes count
             postDiv.appendChild(postContent);
             postDiv.appendChild(replyButton);
             postDiv.appendChild(likeButton);
@@ -324,6 +285,19 @@
             replyFormContainer.innerHTML = '';
             // Fetch and update posts after posting a reply
             fetchPosts();
+        }
+        function searchPosts() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const postsContainer = document.getElementById('posts');
+            const allPosts = postsContainer.querySelectorAll('.post-container');
+            allPosts.forEach(post => {
+                const postContent = post.querySelector('.post-content').textContent.toLowerCase();
+                if (postContent.includes(searchInput)) {
+                    post.style.display = 'block';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
         }
 </script>
 
