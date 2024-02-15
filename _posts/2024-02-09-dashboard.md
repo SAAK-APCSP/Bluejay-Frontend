@@ -212,52 +212,48 @@
         // function fetchPosts() {
         //     // Implement the code to fetch and display posts
         // }
-
         function createPost() {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const uid = document.getElementById("uid").value;
-    const message = document.getElementById("message").value;
-
-    const body = {
-        uid: uid,
-        message: message
-    };
-
-    const authOptions = {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: myHeaders,
-        body: JSON.stringify(body),
-        credentials: 'include'
-    };
-
-    fetch('http://127.0.0.1:8086/api/messages/send', authOptions)
-        .then(response => {
-            if (!response.ok) {
-                console.error('Failed to create post:', response.status);
-                return null;
-            }
-            const contentType = response.headers.get('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
-            } else {
-                return response.text();
-            }
-        })
-        .then(data => {
-            if (data !== null) {
-                console.log('Response:', data);
-                // Update the posts container with the new post
-                updatePostsContainer(uid, message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-
-function fetchPosts() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            const uid = document.getElementById("uid").value;
+            const message = document.getElementById("message").value;
+            const body = {
+                uid: uid,
+                message: message,
+                likes: 0
+            };
+            const authOptions = {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: myHeaders,
+                body: JSON.stringify(body),
+                credentials: 'include'
+            };
+            fetch('http://127.0.0.1:8086/api/messages/send', authOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Failed to create post:', response.status);
+                        return null;
+                    }
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    if (data !== null) {
+                        console.log('Response:', data);
+                        // Update the posts container with the new post
+                        updatePostsContainer(uid, message, 0);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        function fetchPosts() {
             fetch('http://127.0.0.1:8086/api/messages')
                 .then(response => {
                     if (!response.ok) {
@@ -275,83 +271,60 @@ function fetchPosts() {
                     console.error('Error:', error);
                 });
         }
- function displayPosts(posts) {
+        function displayPosts(posts) {
             const postsContainer = document.getElementById('posts');
             postsContainer.innerHTML = ''; // Clear existing posts
-
             posts.forEach(post => {
-                updatePostsContainer(post.uid, post.message, post.replies);
+                updatePostsContainer(post.uid, post.message, post.likes);
             });
         }
-
-        function updatePostsContainer(uid, message, replies = []) {
+        function updatePostsContainer(uid, message, likes) {
             const postsContainer = document.getElementById('posts');
-
             const postDiv = document.createElement('div');
             postDiv.className = 'post-container';
-
             const postContent = document.createElement('p');
             postContent.className = 'post-content';
             postContent.textContent = `UID: ${uid}, Message: ${message}`;
-
             const replyButton = document.createElement('button');
             replyButton.textContent = 'Reply';
             replyButton.addEventListener('click', () => showReplyForm(uid));
-
+            const likeButton = document.createElement('button'); // Like button
+            likeButton.textContent = 'Like';
+            likeButton.addEventListener('click', () => likePost(uid));
+            const likesCountSpan = document.createElement('span');
+            likesCountSpan.className = 'likes-count';
+            likesCountSpan.textContent = `${likes} Likes`; // Display likes count
             postDiv.appendChild(postContent);
             postDiv.appendChild(replyButton);
-
-            // Append replies
-            const repliesContainer = document.createElement('div');
-            repliesContainer.className = 'replies-container';
-
-            replies.forEach(reply => {
-                const replyDiv = document.createElement('div');
-                replyDiv.className = 'reply-container';
-
-                const replyContent = document.createElement('p');
-                replyContent.textContent = `Reply to UID ${reply.uid}: ${reply.message}`;
-
-                replyDiv.appendChild(replyContent);
-                repliesContainer.appendChild(replyDiv);
-            });
-
-            postDiv.appendChild(repliesContainer);
+            postDiv.appendChild(likeButton);
+            postDiv.appendChild(likesCountSpan); // Include likes count
             postsContainer.appendChild(postDiv);
         }
-
-    function showReplyForm(parentUID) {
-        const replyFormContainer = document.getElementById('replyFormContainer');
-        replyFormContainer.innerHTML = ''; // Clear existing content
-
-        const replyForm = document.createElement('form');
-        replyForm.className = 'reply-form-container';
-        replyForm.innerHTML = `
-            <h3>Reply to UID: ${parentUID}</h3>
-            <textarea id="replyMessage" placeholder="Type your reply..."></textarea>
-            <button type="button" onclick="postReply('${parentUID}')">Post Reply</button>
-        `;
-
-        replyFormContainer.appendChild(replyForm);
-    }
-
-    function postReply(parentUID) {
-        const replyMessage = document.getElementById('replyMessage').value;
-
-        // You can now send the replyMessage and parentUID to your server
-        // Similar to the createPost function
-        // Remember to update the server-side code to handle replies
-
-        // For demonstration, let's just log the reply message
-        console.log(`Reply to UID ${parentUID}: ${replyMessage}`);
-
-        // Clear the reply form after posting
-        const replyFormContainer = document.getElementById('replyFormContainer');
-        replyFormContainer.innerHTML = '';
-
-        // Fetch and update posts after posting a reply
-        fetchPosts();
-    }
+        function showReplyForm(parentUID) {
+            const replyFormContainer = document.getElementById('replyFormContainer');
+            replyFormContainer.innerHTML = ''; // Clear existing content
+            const replyForm = document.createElement('form');
+            replyForm.className = 'reply-form-container';
+            replyForm.innerHTML = `
+                <h3>Reply to UID: ${parentUID}</h3>
+                <textarea id="replyMessage" placeholder="Type your reply..."></textarea>
+                <button type="button" onclick="postReply('${parentUID}')">Post Reply</button>
+            `;
+            replyFormContainer.appendChild(replyForm);
+        }
+        function postReply(parentUID) {
+            const replyMessage = document.getElementById('replyMessage').value;
+            // You can now send the replyMessage and parentUID to your server
+            // Similar to the createPost function
+            // Remember to update the server-side code to handle replies
+            // For demonstration, let's just log the reply message
+            console.log(`Reply to UID ${parentUID}: ${replyMessage}`);
+            // Clear the reply form after posting
+            const replyFormContainer = document.getElementById('replyFormContainer');
+            replyFormContainer.innerHTML = '';
+            // Fetch and update posts after posting a reply
+            fetchPosts();
+        }
 </script>
 
 <!-- Add a container for the reply form -->
