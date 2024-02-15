@@ -321,6 +321,52 @@
             });
     }
     function likePost(uid) {
+        // Increment the like count in the DOM immediately
+        const likesCountSpan = document.querySelector(`.post-container[data-uid="${uid}"] .likes-count`);
+        if (likesCountSpan) {
+            const currentLikes = parseInt(likesCountSpan.textContent, 10) || 0;
+            likesCountSpan.textContent = `${currentLikes + 1} 👍`;
+        }
+        // Now, send the request to the server to update likes
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        // Prepare the request body
+        const body = {
+            uid: uid,
+        };
+        const authOptions = {
+            method: 'PUT', // Assuming you are using a PUT request to update likes
+            cache: 'no-cache',
+            headers: myHeaders,
+            body: JSON.stringify(body),
+            credentials: 'include'
+        };
+        fetch(`http://127.0.0.1:8086/api/messages/like/${uid}`, authOptions)
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to like post:', response.status);
+                    // Revert the like count in case of an error
+                    if (likesCountSpan) {
+                        likesCountSpan.textContent = `${currentLikes} 👍`;
+                    }
+                    return null;
+                }
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                if (data !== null) {
+                    console.log('Like Response:', data);
+                    // Update the like count in the DOM if needed
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
     function searchPosts() {
         const searchInput = document.getElementById('searchInput').value.toLowerCase();
