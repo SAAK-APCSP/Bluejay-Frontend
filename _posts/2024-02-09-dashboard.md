@@ -18,7 +18,6 @@
                 border-color: #00FF00; /* Green */
             }
         }
-
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -29,7 +28,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .login-container {
             border-radius: 15px;
             padding: 20px;
@@ -40,7 +38,6 @@
             animation: strobe 2s infinite; /* Apply strobe light effect to the border */
             width: 300px; /* Adjusted width */
         }
-
         input[type=text], input[type=password] {
             width: 100%;
             padding: 12px 20px;
@@ -51,7 +48,6 @@
             background-color: #171515;
             color: #39FF14;
         }
-
         button {
             background-color: #39FF14;
             color: #171515;
@@ -61,26 +57,21 @@
             cursor: pointer;
             width: 100%; /* Adjusted width */
         }
-
         button:hover {
             opacity: 0.8;
         }
-
         span.psw {
             display: block;
             text-align: center;
             margin-top: 16px;
             color: #39FF14;
         }
-
         @media screen and (max-width: 300px) {
             span.psw {
                 display: block;
                 float: none;
             }
         }
-    
-        
         .container {
             display: flex;
             justify-content: space-between;
@@ -149,13 +140,16 @@
         background-color: #000; /* Black background color */
         color: #fff; /* Text color */
     }
-
     .post-content {
         margin: 0; /* Remove default margin for <p> */
     }
+    #postsWrapper {
+            max-height: 300px; /* Adjust the maximum height as needed */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
     </style>
 </head>
-<body>
+<body onload="fetchPosts();">
     <div class="container">
         <div class="input-container">
         <form action="javascript:createPost()" id="postButton">
@@ -165,7 +159,7 @@
             <button id="postButton">Post</button>
         </form>
         </div>
-        <div class="posts-container">
+        <div class="posts-container" id="postsWrapper">
             <h2>Posts</h2>
             <input type="text" id="searchInput" oninput="searchPosts()" placeholder="Search posts...">
             <div id="posts"></div>
@@ -219,6 +213,7 @@
         myHeaders.append("Content-Type", "application/json");
         const authOptions = {
             method: 'GET',
+            cache: 'no-cache',
             headers: myHeaders,
             credentials: 'include'
         };
@@ -319,7 +314,6 @@
                     const replyFormContainer = document.getElementById('replyFormContainer');
                     replyFormContainer.innerHTML = '';
                     // Fetch and update posts after posting a reply
-                    fetchPosts();
                 }
             })
             .catch(error => {
@@ -327,7 +321,6 @@
             });
     }
     function likePost(uid) {
-        // Implement liking a post here (similar to createPost and postReply)
     }
     function searchPosts() {
         const searchInput = document.getElementById('searchInput').value.toLowerCase();
