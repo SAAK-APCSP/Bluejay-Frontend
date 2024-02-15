@@ -159,48 +159,67 @@
         </div>
     </div>
     <div id="latestPosts" class="latest-posts"></div>
-    <script type="module">
-        import { uri, options } from '{{site.baseurl}}/config.js';
-            function createPost() {
-                var myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                const body = {
-                    uid: document.getElementById("uid").value,
-                    message: document.getElementById("message").value
-                };
-                const authOptions = {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    headers: myHeaders,
-                    body: JSON.stringify(body),
-                    credentials: 'include'
-                };
-                fetch(uri + '/api/messages/send', authOptions)
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error('Failed to create post:', response.status);
-                            return null;
-                        }
-                        const contentType = response.headers.get('Content-Type');
-                        if (contentType && contentType.includes('application/json')) {
-                            return response.json();
-                        } else {
-                            return response.text();
-                        }
-                    })
-                    .then(data => {
-                        if (data !== null) {
-                            console.log('Response:', data);
-                            fetchPosts();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            }
-            function fetchPosts() {
-                // Implement the code to fetch and display posts
+    <script>
+        function createPost() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            const body = {
+                uid: document.getElementById("uid").value,
+                message: document.getElementById("message").value
             };
+            const authOptions = {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: myHeaders,
+                body: JSON.stringify(body),
+                credentials: 'include'
+            };
+            fetch('http://127.0.0.1:8086/api/messages/send', authOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Failed to create post:', response.status);
+                        return null;
+                    }
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    if (data !== null) {
+                        console.log('Response:', data);
+                        fetchPosts();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function fetchPosts() {
+            // Implement the code to fetch and display posts
+        }
     </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="input-container">
+            <form action="javascript:createPost()" id="postButton">
+                <h2>Post Your Message</h2>
+                <input type="text" id="uid" placeholder="Enter UID..." enabled>
+                <textarea id="message" placeholder="Type your post..." enabled></textarea>
+                <button id="postButton" onclick="createPost()" enabled>Post</button>
+            </form>
+        </div>
+        <div class="posts-container">
+            <h2>Posts</h2>
+            <div id="posts"></div>
+        </div>
+    </div>
+    <div id="latestPosts" class="latest-posts"></div>
 </body>
+
 </html>
