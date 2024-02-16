@@ -25,9 +25,9 @@
             color: #39FF14;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
-        .login-container {
+        .container {
             border-radius: 15px;
             padding: 20px;
             border: 5px solid transparent;
@@ -35,28 +35,58 @@
             background-color: #171515;
             color: #39FF14;
             animation: strobe 2s infinite; /* Apply strobe light effect to the border */
-            width: 300px; /* Adjusted width */
-            margin: auto; /* Center the login container */
-            margin-bottom: 20px; /* Add margin at the bottom */
+            max-width: 1000px;
+            width: 100%; /* Adjusted width */
+            margin: 20px auto; /* Center the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .container {
-            display: flex;
-            flex-direction: column-reverse; /* Reverse the order of the posts */
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px); /* Subtract padding and border from width */
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #000;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
+        }
+        button {
+            width: calc(100% - 20px); /* Subtract padding and border from width */
+            padding: 10px;
+            background-color: #39FF14;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
+        }
+        button:hover {
+            background-color: #2d9e00;
+        }
+        .posts-container {
             max-width: 800px;
-            margin: auto;
+            width: 100%;
             padding: 20px;
             flex: 1; /* Take remaining space */
-        }
-        .input-container,
-        .posts-container {
-            padding: 10px;
+            overflow-y: auto; /* Add vertical scrollbar if needed */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .post-container {
-            position: relative;
+            width: 100%;
+            max-width: 600px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
             padding: 10px;
-            background-color: #fff;
+            background-color: #000;
+            color: #fff;
+            border-radius: 5px;
+            position: relative;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
         }
         .post-actions {
             position: absolute;
@@ -68,47 +98,23 @@
             cursor: pointer;
             background-color: transparent;
             border: none;
-        }
-        .input-container textarea {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            resize: vertical;
-        }
-        .input-container button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: $primary-color;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .input-container button:hover {
-            background-color: darken($primary-color, 10%);
-        }
-        .latest-posts {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-        .latestPost {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 5px;
-        }
-        .post-container {
-            position: relative;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #000; /* Black background color */
-            color: #fff; /* Text color */
+            color: #39FF14;
         }
         .post-content {
             margin: 0; /* Remove default margin for <p> */
+        }
+        .reply-form-container,
+        .edit-form-container {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #252525; /* Change the background color to a different color */
+            border-radius: 5px;
+            color: #fff; /* Text color */
+        }
+        .reply-form-container h3,
+        .edit-form-container h3 {
+            margin-top: 0;
         }
     </style>
 </head>
@@ -219,6 +225,9 @@
         const replyButton = document.createElement('button');
         replyButton.textContent = 'Reply';
         replyButton.addEventListener('click', () => showReplyForm(uid));
+        const editButton = document.createElement('button'); // Edit button
+        editButton.textContent = 'Edit'; // Set text content to 'Edit'
+        editButton.addEventListener('click', () => showEditForm(uid, message)); // Call showEditForm function
         const likeButton = document.createElement('button'); // Like button
         likeButton.textContent = 'Like';
         likeButton.addEventListener('click', () => {
@@ -231,6 +240,7 @@
         likesCountSpan.textContent = `${likes} 👍`; // Display likes count
         postDiv.appendChild(postContent);
         postDiv.appendChild(replyButton);
+        postDiv.appendChild(editButton); // Append the edit button
         postDiv.appendChild(likeButton);
         postDiv.appendChild(likesCountSpan); // Include likes count
         postsContainer.appendChild(postDiv);
@@ -353,7 +363,64 @@
             }
         });
     }
+    function showEditForm(uid, message) {
+        const editFormContainer = document.getElementById('editFormContainer');
+        editFormContainer.innerHTML = ''; // Clear existing content
+        const editForm = document.createElement('form');
+        editForm.className = 'edit-form-container';
+        editForm.innerHTML = `
+            <h3>Edit Message with UID: ${uid}</h3>
+            <textarea id="editMessage" placeholder="Edit your message...">${message}</textarea>
+            <button type="button" onclick="editPost('${uid}')">Save Changes</button>
+        `;
+        editFormContainer.appendChild(editForm);
+    }
+    function editPost(uid) {
+        const editedMessage = document.getElementById('editMessage').value;
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        const body = {
+            uid: uid,
+            message: editedMessage,
+        };
+        const authOptions = {
+            method: 'PUT',
+            cache: 'no-cache',
+            headers: myHeaders,
+            body: JSON.stringify(body),
+            credentials: 'include'
+        };
+        fetch('http://127.0.0.1:8086/api/messages/edit', authOptions)
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to edit post:', response.status);
+                    return null;
+                }
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                if (data !== null) {
+                    console.log('Edit Response:', data);
+                    // Clear the edit form after editing
+                    const editFormContainer = document.getElementById('editFormContainer');
+                    editFormContainer.innerHTML = '';
+                    // Fetch and update posts after editing a message
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 </script>
+
 
 <!-- Add a container for the reply form -->
 <div id="replyFormContainer"></div>
+
+<!-- Add a container for the edit form -->
+<div id="editFormContainer"></div>
