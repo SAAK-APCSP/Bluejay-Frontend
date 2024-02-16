@@ -235,14 +235,17 @@
             // Hide the like button after clicking
             likeButton.style.display = 'none';
         });
+        const likeCountContainer = document.createElement('div'); // Create container for like count
+        likeCountContainer.className = 'like-count-container'; // Assign a class to the container
         const likesCountSpan = document.createElement('span'); // Create the likes count span
         likesCountSpan.className = 'likes-count'; // Assign the likes-count class
         likesCountSpan.textContent = `${likes} 👍`; // Display likes count
+        likeCountContainer.appendChild(likesCountSpan); // Append likes count span to container
         postDiv.appendChild(postContent);
         postDiv.appendChild(replyButton);
         postDiv.appendChild(editButton); // Append the edit button
         postDiv.appendChild(likeButton);
-        postDiv.appendChild(likesCountSpan); // Include likes count
+        postDiv.appendChild(likeCountContainer); // Append like count container
         postsContainer.appendChild(postDiv);
     }
     function showReplyForm(parentUID) {
