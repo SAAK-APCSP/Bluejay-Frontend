@@ -129,7 +129,7 @@
         </div>
     </div>
     <div id="latestPosts" class="latest-posts"></div>
-   <script>
+<script>
     function createPost() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -209,31 +209,32 @@
         });
     }
     function updatePostsContainer(uid, message, likes) {
-    const postsContainer = document.getElementById('posts');
-    const postDiv = document.createElement('div');
-    postDiv.className = 'post-container';
-    const postContent = document.createElement('p');
-    postContent.className = 'post-content';
-    postContent.textContent = `UID: ${uid}, Message: ${message}`;
-    const replyButton = document.createElement('button');
-    replyButton.textContent = 'Reply';
-    replyButton.addEventListener('click', () => showReplyForm(uid));
-    const likeButton = document.createElement('button'); // Like button
-    likeButton.textContent = 'Like';
-    likeButton.addEventListener('click', () => {
-        likePost(uid, message);
-        // Hide the like button after clicking
-        likeButton.style.display = 'none';
-    });
-    const likesCountSpan = document.createElement('span');
-    likesCountSpan.className = 'likes-count';
-    likesCountSpan.textContent = `${likes} 👍`; // Display likes count
-    postDiv.appendChild(postContent);
-    postDiv.appendChild(replyButton);
-    postDiv.appendChild(likeButton);
-    postDiv.appendChild(likesCountSpan); // Include likes count
-    postsContainer.appendChild(postDiv);
-}
+        const postsContainer = document.getElementById('posts');
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post-container';
+        postDiv.dataset.uid = uid; // Assigning uid as a dataset attribute
+        const postContent = document.createElement('p');
+        postContent.className = 'post-content';
+        postContent.textContent = `UID: ${uid}, Message: ${message}`;
+        const replyButton = document.createElement('button');
+        replyButton.textContent = 'Reply';
+        replyButton.addEventListener('click', () => showReplyForm(uid));
+        const likeButton = document.createElement('button'); // Like button
+        likeButton.textContent = 'Like';
+        likeButton.addEventListener('click', () => {
+            likePost(uid, message);
+            // Hide the like button after clicking
+            likeButton.style.display = 'none';
+        });
+        const likesCountSpan = document.createElement('span'); // Create the likes count span
+        likesCountSpan.className = 'likes-count'; // Assign the likes-count class
+        likesCountSpan.textContent = `${likes} 👍`; // Display likes count
+        postDiv.appendChild(postContent);
+        postDiv.appendChild(replyButton);
+        postDiv.appendChild(likeButton);
+        postDiv.appendChild(likesCountSpan); // Include likes count
+        postsContainer.appendChild(postDiv);
+    }
     function showReplyForm(parentUID) {
         const replyFormContainer = document.getElementById('replyFormContainer');
         replyFormContainer.innerHTML = ''; // Clear existing content
@@ -291,8 +292,9 @@
     function likePost(uid, message) {
         // Increment the like count in the DOM immediately
         const likesCountSpan = document.querySelector(`.post-container[data-uid="${uid}"] .likes-count`);
+        var currentLikes = 0;
         if (likesCountSpan) {
-            var currentLikes = parseInt(likesCountSpan.textContent, 10) || 0;
+            currentLikes = parseInt(likesCountSpan.textContent, 10) || 0;
             likesCountSpan.textContent = `${currentLikes + 1} 👍`;
         }
         // Now, send the request to the server to update likes
@@ -329,7 +331,9 @@
             .then(data => {
                 if (data !== null) {
                     console.log('Like Response:', data);
-                    // Update the like count in the DOM if needed
+                    if (likesCountSpan) {
+                        likesCountSpan.textContent = `${currentLikes + 1} 👍`;
+                    }
                 }
             })
             .catch(error => {
