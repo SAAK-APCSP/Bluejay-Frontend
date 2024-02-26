@@ -18,7 +18,104 @@
                 border-color: #00FF00; /* Green */
             }
         }
-        
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #171515;
+            color: #39FF14;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            border-radius: 15px;
+            padding: 20px;
+            border: 5px solid transparent;
+            background-clip: padding-box;
+            background-color: #171515;
+            color: #39FF14;
+            animation: strobe 2s infinite; /* Apply strobe light effect to the border */
+            max-width: 1000px;
+            width: 100%; /* Adjusted width */
+            margin: 20px auto; /* Center the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px); /* Subtract padding and border from width */
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #000;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
+        }
+        button {
+            width: calc(100% - 20px); /* Subtract padding and border from width */
+            padding: 10px;
+            background-color: #39FF14;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
+        }
+        button:hover {
+            background-color: #2d9e00;
+        }
+        .posts-container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            flex: 1; /* Take remaining space */
+            overflow-y: auto; /* Add vertical scrollbar if needed */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .post-container {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            border-radius: 5px;
+            position: relative;
+            box-sizing: border-box; /* Include padding and border in the width calculation */
+        }
+        .post-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .post-actions button {
+            margin-right: 5px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            color: #39FF14;
+        }
+        .post-content {
+            margin: 0; /* Remove default margin for <p> */
+        }
+        .reply-form-container,
+        .edit-form-container {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #252525; /* Change the background color to a different color */
+            border-radius: 5px;
+            color: #fff; /* Text color */
+        }
+        .reply-form-container h3,
+        .edit-form-container h3 {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body onload="fetchPosts();">
