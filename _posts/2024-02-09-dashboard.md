@@ -103,8 +103,7 @@
         .post-content {
             margin: 0; /* Remove default margin for <p> */
         }
-        .reply-form-container,
-        .edit-form-container {
+        .reply-form-container {
             margin-top: 10px;
             border: 1px solid #ccc;
             padding: 10px;
@@ -112,8 +111,7 @@
             border-radius: 5px;
             color: #fff; /* Text color */
         }
-        .reply-form-container h3,
-        .edit-form-container h3 {
+        .reply-form-container h3 {
             margin-top: 0;
         }
     </style>
@@ -225,27 +223,27 @@
         const replyButton = document.createElement('button');
         replyButton.textContent = 'Reply';
         replyButton.addEventListener('click', () => showReplyForm(uid));
-        const editButton = document.createElement('button'); // Edit button
-        editButton.textContent = 'Edit'; // Set text content to 'Edit'
-        editButton.addEventListener('click', () => showEditForm(uid, message)); // Call showEditForm function
-        const likeButton = document.createElement('button'); // Like button
+        const deleteButton = document.createElement('button'); // Delete button
+        deleteButton.textContent = 'Delete'; // Set text content to 'Delete'
+        deleteButton.addEventListener('click', () => deletePost(uid, message)); // Attach event listener to delete button
+        const likeButton = document.createElement('button');
         likeButton.textContent = 'Like';
         likeButton.addEventListener('click', () => {
             likePost(uid, message);
             // Hide the like button after clicking
             likeButton.style.display = 'none';
         });
-        const likeCountContainer = document.createElement('div'); // Create container for like count
-        likeCountContainer.className = 'like-count-container'; // Assign a class to the container
-        const likesCountSpan = document.createElement('span'); // Create the likes count span
-        likesCountSpan.className = 'likes-count'; // Assign the likes-count class
-        likesCountSpan.textContent = `${likes} 👍`; // Display likes count
-        likeCountContainer.appendChild(likesCountSpan); // Append likes count span to container
+        const likeCountContainer = document.createElement('div');
+        likeCountContainer.className = 'like-count-container';
+        const likesCountSpan = document.createElement('span');
+        likesCountSpan.className = 'likes-count';
+        likesCountSpan.textContent = `${likes} 👍`;
+        likeCountContainer.appendChild(likesCountSpan);
         postDiv.appendChild(postContent);
         postDiv.appendChild(replyButton);
-        postDiv.appendChild(editButton); // Append the edit button
+        postDiv.appendChild(deleteButton); // Append the delete button
         postDiv.appendChild(likeButton);
-        postDiv.appendChild(likeCountContainer); // Append like count container
+        postDiv.appendChild(likeCountContainer);
         postsContainer.appendChild(postDiv);
     }
     function showReplyForm(parentUID) {
@@ -366,30 +364,15 @@
             }
         });
     }
-    function showEditForm(uid, message) {
-        const editFormContainer = document.getElementById('editFormContainer');
-        editFormContainer.innerHTML = ''; // Clear existing content
-        const editForm = document.createElement('form');
-        editForm.className = 'edit-form-container';
-        editForm.innerHTML = `
-            <h3>Edit Message with UID: ${uid}</h3>
-            <textarea id="editMessage" placeholder="Edit your message...">${message}</textarea>
-            <button type="button" onclick="editPost('${uid}')">Save Changes</button>
-        `;
-        editFormContainer.appendChild(editForm);
-    }
-    function editPost(uid) {
-        const editedMessage = document.getElementById('editMessage').value;
+    function deletePost(uid, message) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         const body = {
-            // uid: uid,
-            message: editedMessage,
+            uid: uid,
+            message: message
         };
-        console.log(body);
         const authOptions = {
-            method: 'DELETE', // Change method to POST
-            // mode: 'cors',
+            method: 'DELETE',
             cache: 'no-cache',
             headers: myHeaders,
             body: JSON.stringify(body),
@@ -398,7 +381,7 @@
         fetch('http://127.0.0.1:8086/api/messages/delete', authOptions)
             .then(response => {
                 if (!response.ok) {
-                    console.error('Failed to edit post:', response.status);
+                    console.error('Failed to delete post:', response.status);
                     return null;
                 }
                 const contentType = response.headers.get('Content-Type');
@@ -410,12 +393,8 @@
             })
             .then(data => {
                 if (data !== null) {
-                    console.log('Edit Response:', data);
-                    // Clear the edit form after editing
-                    const editFormContainer = document.getElementById('editFormContainer');
-                    editFormContainer.innerHTML = '';
-                    // Fetch and update posts after editing a message
-                    fetchPosts(); // Call the fetchPosts function to update the posts
+                    console.log('Delete Response:', data);
+                    fetchPosts();
                 }
             })
             .catch(error => {
@@ -427,6 +406,3 @@
 
 <!-- Add a container for the reply form -->
 <div id="replyFormContainer"></div>
-
-<!-- Add a container for the edit form -->
-<div id="editFormContainer"></div>
