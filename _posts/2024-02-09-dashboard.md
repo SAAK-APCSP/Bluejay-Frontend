@@ -235,14 +235,17 @@
             // Hide the like button after clicking
             likeButton.style.display = 'none';
         });
+        const likeCountContainer = document.createElement('div'); // Create container for like count
+        likeCountContainer.className = 'like-count-container'; // Assign a class to the container
         const likesCountSpan = document.createElement('span'); // Create the likes count span
         likesCountSpan.className = 'likes-count'; // Assign the likes-count class
         likesCountSpan.textContent = `${likes} 👍`; // Display likes count
+        likeCountContainer.appendChild(likesCountSpan); // Append likes count span to container
         postDiv.appendChild(postContent);
         postDiv.appendChild(replyButton);
         postDiv.appendChild(editButton); // Append the edit button
         postDiv.appendChild(likeButton);
-        postDiv.appendChild(likesCountSpan); // Include likes count
+        postDiv.appendChild(likeCountContainer); // Append like count container
         postsContainer.appendChild(postDiv);
     }
     function showReplyForm(parentUID) {
@@ -380,17 +383,19 @@
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         const body = {
-            uid: uid,
+            // uid: uid,
             message: editedMessage,
         };
+        console.log(body);
         const authOptions = {
-            method: 'PUT',
+            method: 'DELETE', // Change method to POST
+            // mode: 'cors',
             cache: 'no-cache',
             headers: myHeaders,
             body: JSON.stringify(body),
             credentials: 'include'
         };
-        fetch('http://127.0.0.1:8086/api/messages/edit', authOptions)
+        fetch('http://127.0.0.1:8086/api/messages/delete', authOptions)
             .then(response => {
                 if (!response.ok) {
                     console.error('Failed to edit post:', response.status);
@@ -410,6 +415,7 @@
                     const editFormContainer = document.getElementById('editFormContainer');
                     editFormContainer.innerHTML = '';
                     // Fetch and update posts after editing a message
+                    fetchPosts(); // Call the fetchPosts function to update the posts
                 }
             })
             .catch(error => {
