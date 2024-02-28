@@ -121,7 +121,6 @@
         <div class="input-container">
         <form action="javascript:createPost()" id="postButton">
             <h2>Post Your Message</h2>
-            <input type="text" id="uid" placeholder="Enter UID...">
             <textarea id="message" placeholder="Type your post..."></textarea>
             <button id="postButton">Post</button>
         </form>
@@ -137,10 +136,8 @@
     function createPost() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-        const uid = document.getElementById("uid").value;
         const message = document.getElementById("message").value;
         const body = {
-            uid: uid,
             message: message,
             likes: 0
         };

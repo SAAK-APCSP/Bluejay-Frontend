@@ -1,15 +1,10 @@
-title: SAAK
+title: BlueJay
 description: "August 2023 to June 2024"
 owner_name: SAAK Group
 github_repo: "SAAK_repo"
-baseurl: "/SAAK"
+baseurl: "/BlueJay"
 future: true
-remote_theme: jekyll/minima
-minima:
-  social_links:
-    - { platform: github, user_url: "https://github.com/SAAK-APCSP/SAAK_repo/"}
-    - { platform: x, user_url: "https://x.com/NighthawkCoding/" }
-    - { platform: youtube, user_url: "https://www.youtube.com/@nighthawkcodingsociety2868" }      
+remote_theme: jekyll/minima    
 # remote_theme: pages-themes/dinky@v0.2.0
 # remote_theme: pages-themes/minimal@v0.2.0
 # remote_theme: pages-themes/hacker@v0.2.0
@@ -20,5 +15,8 @@ plugins:
 header_pages:
   - navigation/blog.md
   - navigation/search.html
+  - _posts/2024-01-22-login.md
+  - _posts/2024-01-22-SignUp.md
+
 
 
